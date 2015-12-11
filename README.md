@@ -56,5 +56,5 @@ git cherry-pick --no-commit --no-ff ${last_commit}
 git status
 git add/rm
 git commit
-git push
+git push oauth2_spec HEAD:master
 ```
