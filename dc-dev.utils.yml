@@ -19,9 +19,6 @@ redis:
   image: redis
 rails:
   image: peoplepicker_server
-  environment:
-    - REDIS_HOST=redis.local
-    - REDIS_PORT=6379
   volumes_from:
     - server
   env_file:
