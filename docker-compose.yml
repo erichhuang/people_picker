@@ -1,0 +1,11 @@
+server:
+  extends:
+    file: dc-base.yml
+    service: webapp
+  links:
+    - 'db:db.local'
+    - 'redis:redis.local'
+db:
+  extends:
+    file: dc-base.yml
+    service: db

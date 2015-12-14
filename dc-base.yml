@@ -1,0 +1,15 @@
+webapp:
+  build: .
+  env_file:
+    - webapp.env
+    - db.env
+  ports:
+    - "3000:3000"
+db:
+  build: ./docker/builds/db
+  env_file:
+    - db.env
+  ports:
+    - "2222:22"
+redis:
+  image: redis
