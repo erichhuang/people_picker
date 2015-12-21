@@ -40,3 +40,4 @@ docker/includes/instantclient
 # Gemfile.lock
 # .ruby-version
 # .ruby-gemset
+ldap.oit.env
