@@ -19,7 +19,7 @@ ENV LATEST_RUBY_URL http://cache.ruby-lang.org/pub/ruby/2.2/${LATEST_RUBY}.tar.g
 ADD docker/includes/install_ruby.sh /root/installs/install_ruby.sh
 RUN ["chmod", "777", "/root/installs/install_ruby.sh"]
 RUN ["/root/installs/install_ruby.sh"]
-RUN ["/usr/local/bin/gem", "install", "bundler"]
+RUN ["/usr/local/bin/gem", "install", "bundler", "-v", "1.11.2"]
 
 #sqlite client
 RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "sqlite", "sqlite-devel"]

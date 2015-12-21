@@ -108,6 +108,7 @@ GEM
     minitest (5.8.3)
     multi_json (1.11.2)
     multi_xml (0.5.5)
+    net-ldap (0.12.1)
     nokogiri (1.6.7)
       mini_portile2 (~> 2.0.0.rc2)
     puma (2.15.3)
@@ -211,6 +212,7 @@ DEPENDENCIES
   hashie-forbidden_attributes
   jquery-rails
   jwt
+  net-ldap
   puma
   rack-cors
   rails (= 4.2.1)
@@ -227,4 +229,4 @@ DEPENDENCIES
   uglifier
 
 BUNDLED WITH
-   1.10.6
+   1.11.2

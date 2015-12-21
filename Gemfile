@@ -24,6 +24,9 @@ gem 'uglifier'
 # use redis to cache the user temporarily
 gem 'redis'
 
+# search ldap
+gem 'net-ldap'
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
