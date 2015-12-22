@@ -116,4 +116,30 @@ RSpec.describe User, type: :model do
       expect(User.credentials(token)).to be_nil
     end
   end
+
+  describe 'User.first_name_begins' do
+    let(:users) { FactoryGirl.create_list(:user, 5)}
+    let(:first_name_begins) { users.first.first_name[0,3] }
+    subject { User.first_name_begins(first_name_begins) }
+
+    it 'should take a string and return only users with first name beginning with the string' do
+      expect(subject.count).to eq(User.where('first_name like ?', "#{first_name_begins}%").count)
+      subject.each do |ruser|
+        expect(ruser.first_name).to start_with first_name_begins
+      end
+    end
+  end
+
+  describe 'User.last_name_begins' do
+    let(:users) { FactoryGirl.create_list(:user, 5)}
+    let(:last_name_begins) { users.first.first_name[0,3] }
+    subject { User.last_name_begins(last_name_begins) }
+
+    it 'should take a string and return only users with last name beginning with the string' do
+      expect(subject.count).to eq(User.where('last_name like ?', "#{last_name_begins}%").count)
+      subject.each do |ruser|
+        expect(ruser.last_name).to start_with last_name_begins
+      end
+    end
+  end
 end
