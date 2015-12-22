@@ -27,13 +27,15 @@ gem 'redis'
 # search ldap
 gem 'net-ldap'
 
+# use faker and factory_girl in all environments
+gem "factory_girl_rails"
+gem "faker"
+
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
 group :development, :test do
   gem 'spring'
-  gem "factory_girl_rails"
-  gem "faker"
   gem 'rspec-rails'
   gem 'shoulda-matchers', require: false
   gem 'spring-commands-rspec', group: :development
