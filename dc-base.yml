@@ -3,6 +3,7 @@ webapp:
   env_file:
     - webapp.env
     - db.env
+    - ldap.env
   ports:
     - "3000:3000"
 db:

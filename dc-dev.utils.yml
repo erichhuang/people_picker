@@ -13,6 +13,7 @@ db:
   build: ./docker/builds/db
   env_file:
     - db.env
+    - ldap.env
   ports:
     - "2222:22"
 redis:
@@ -24,6 +25,7 @@ rails:
   env_file:
     - webapp.env
     - db.env
+    - ldap.env
   links:
     - 'db:db.local'
     - redis:redis.local
@@ -35,6 +37,7 @@ rake:
   env_file:
     - webapp.env
     - db.env
+    - ldap.env
   links:
     - 'db:db.local'
     - redis:redis.local
@@ -48,6 +51,7 @@ consumer:
     - consumer.env
     - webapp.env
     - db.env
+    - ldap.env
   links:
     - 'db:db.local'
   entrypoint: ['rake']
@@ -59,6 +63,7 @@ rspec:
   env_file:
     - webapp.env
     - db.env
+    - ldap.env
   volumes_from:
     - server
   links:
