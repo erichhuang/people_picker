@@ -2,6 +2,8 @@ require 'rails_helper'
 
 RSpec.describe User, type: :model do
   subject { FactoryGirl.create(:user) }
+  let(:users) { FactoryGirl.create_list(:user, 5, :real) }
+
   let(:scope) { Rails.application.config.default_scope }
   let(:min_secs) { 3 * 60 * 60 }
   let(:full_expire) { 4 * 60 * 60 }
@@ -25,6 +27,29 @@ RSpec.describe User, type: :model do
   describe 'user.display_name' do
     it 'should be supported' do
       expect(subject).to respond_to 'display_name'
+    end
+  end
+
+  describe 'UserSerializer' do
+    it 'should serialize to json' do
+      serializer = UserSerializer.new subject
+      payload = serializer.to_json
+      expect(payload).to be
+      parsed_json = JSON.parse(payload)
+      expect(parsed_json).to have_key('id')
+      expect(parsed_json).to have_key('uid')
+      expect(parsed_json).to have_key('first_name')
+      expect(parsed_json).to have_key('last_name')
+      expect(parsed_json).to have_key('email')
+      expect(parsed_json).to have_key('is_persisted')
+      expect(parsed_json).to have_key('is_real')
+      expect(parsed_json['id']).to eq(subject.id)
+      expect(parsed_json['uid']).to eq(subject.uid)
+      expect(parsed_json['first_name']).to eq(subject.first_name)
+      expect(parsed_json['last_name']).to eq(subject.last_name)
+      expect(parsed_json['email']).to eq(subject.email)
+      expect(parsed_json['is_persisted']).to eq(subject.persisted?)
+      expect(parsed_json['is_real']).to eq(subject.is_real?)
     end
   end
 
@@ -118,7 +143,6 @@ RSpec.describe User, type: :model do
   end
 
   describe 'User.first_name_begins' do
-    let(:users) { FactoryGirl.create_list(:user, 5)}
     let(:first_name_begins) { users.first.first_name[0,3] }
     subject { User.first_name_begins(first_name_begins) }
 
@@ -131,7 +155,6 @@ RSpec.describe User, type: :model do
   end
 
   describe 'User.last_name_begins' do
-    let(:users) { FactoryGirl.create_list(:user, 5)}
     let(:last_name_begins) { users.first.first_name[0,3] }
     subject { User.last_name_begins(last_name_begins) }
 
