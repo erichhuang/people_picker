@@ -4,10 +4,7 @@ Rails.application.routes.draw do
 
     collection do
       get 'stats'
-      get 'fetch_existing'
-      get 'feeling_lucky'
-      get 'fetch_ldap'
-      post 'multi', to: 'users#create_multi'
+      get 'fetch'
     end
   end
 end

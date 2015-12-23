@@ -11,16 +11,8 @@ RSpec.describe UsersController, type: :routing do
       expect(:get => "/users/1/use").to route_to(controller: "users", action: "use", id: "1")
     end
 
-    it "routes to #fetch_existing" do
-      expect(:get => "/users/fetch_existing").to route_to("users#fetch_existing")
-    end
-
-    it "routes to #fetch_ldap" do
-      expect(:get => "/users/fetch_ldap").to route_to("users#fetch_ldap")
-    end
-
-    it "routes to #feeling_lucky" do
-      expect(:get => "/users/feeling_lucky").to route_to("users#feeling_lucky")
+    it "routes to #fetch" do
+      expect(:get => "/users/fetch").to route_to("users#fetch")
     end
 
     it "routes to #stats" do
@@ -29,10 +21,6 @@ RSpec.describe UsersController, type: :routing do
 
     it "routes to #create" do
       expect(:post => "/users").to route_to("users#create")
-    end
-
-    it "routes to #create_multi" do
-      expect(:post => "/users/multi").to route_to("users#create_multi")
     end
 
   end

@@ -27,45 +27,33 @@ class UsersController < ApplicationController
     end
   end
 
-  def fetch_existing
+  def fetch
     unless session_valid
       render plain: 'invalid_request', status: 401, layout: false
       return
     end
-    unless params.has_key?(:first_name_begins) || params.has_key?(:last_name_begins)
+    unless params.has_key?(:number) || params.has_key?(:first_name_begins) || params.has_key?(:last_name_begins)
       render plain: 'invalid_request', status: 401, layout: false
       return
     end
-    @scope = User.unscoped
-    @scope = @scope.first_name_begins(params[:first_name_begins]) if params[:first_name_begins]
-    @scope = @scope.last_name_begins(params[:last_name_begins]) if params[:last_name_begins]
-    render json: @scope.all
-  end
 
-  def fetch_ldap
-    unless session_valid
-      render plain: 'invalid_request', status: 401, layout: false
-      return
+    if params[:number]
+      fetch_multi
+    else
+      @scope = User.unscoped
+      if params[:first_name_begins]
+        @scope = @scope.first_name_begins(params[:first_name_begins])
+      end
+      if params[:last_name_begins]
+        @scope = @scope.last_name_begins(params[:last_name_begins])
+      end
+
+      if @scope.count > 0
+        render json: @scope.all
+      else
+        fetch_ldap
+      end
     end
-    uid = ldap_params
-    ldap = Net::LDAP.new(
-      host: Rails.application.secrets.ldap_host,
-      port: Rails.application.secrets.ldap_port,
-      base: Rails.application.secrets.ldap_base
-    )
-    user = {}
-    ldap.search(
-      filter: Net::LDAP::Filter.eq("uid", uid),
-      attributes: %w(uid sn givenName mail)
-    ) { |entry|
-      user = {
-        uid: entry.uid.first,
-        first_name: entry.givenName.first,
-        last_name: entry.sn.first,
-        email: entry.mail.first
-      }
-    }
-    render json: user
   end
 
   def use
@@ -85,21 +73,13 @@ class UsersController < ApplicationController
     render json: {user_count: User.count}
   end
 
-  def feeling_lucky
-    unless session_valid
-      render plain: 'invalid_request', status: 401, layout: false
-      return
-    end
-    render json: FactoryGirl.attributes_for(:user)
-  end
-
   def create
     unless session_valid
       render plain: 'invalid_request', status: 401, layout: false
       return
     end
     @user = User.new(user_params)
-
+    @user.is_real = false
     respond_to do |format|
       if @user.save
         format.html { render json: @user }
@@ -115,20 +95,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def create_multi
-    unless session_valid
-      render plain: 'invalid_request', status: 401, layout: false
-      return
-    end
-    number = multi_params.to_i
-    if number > 5
-      render plain: 'invalid_request', status: 401, layout: false
-    else
-      users = FactoryGirl.create_list(:user, number)
-      render json: users
-    end
-  end
-
   private
     def session_valid
       [:client_id, :state].each do |required_state|
@@ -139,17 +105,71 @@ class UsersController < ApplicationController
       return true
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
-      params.require(:user).permit(:uid, :first_name, :last_name, :email)
-    end
-
-    def ldap_params
-      params.require(:uid)
+      params.require(:user).permit(:uid, :first_name, :last_name, :email, :is_real)
     end
 
     def multi_params
       params.require(:number)
+    end
+
+    def fetch_multi
+      number = multi_params.to_i
+      if number > 5
+        render plain: 'invalid_request', status: 401, layout: false
+      else
+        users = User.limit(number)
+        if users.count < number
+          remaining = number - users.count
+          users += FactoryGirl.build_list(:user, remaining)
+        end
+        render json: users
+      end
+    end
+
+    def fetch_ldap
+      if params[:first_name_begins] && params[:first_name_begins].length < 3
+        render json: []
+        return
+      end
+
+      if params[:last_name_begins] && params[:last_name_begins].length < 3
+        render json: []
+        return
+      end
+
+      ldap = Net::LDAP.new(
+        host: Rails.application.secrets.ldap_host,
+        port: Rails.application.secrets.ldap_port,
+        base: Rails.application.secrets.ldap_base
+      )
+      users = []
+      filter = false
+      if params[:first_name_begins] && params[:last_name_begins]
+        filter = Net::LDAP::Filter.join(
+          Net::LDAP::Filter.construct("givenName=#{params[:first_name_begins]}*"),
+          Net::LDAP::Filter.construct("sn=#{params[:last_name_begins]}*")
+        )
+      elsif params[:first_name_begins]
+        filter = Net::LDAP::Filter.construct("givenName=#{params[:first_name_begins]}*")
+      else
+        filter = Net::LDAP::Filter.construct("sn=#{params[:last_name_begins]}*")
+      end
+      ldap.search(
+        filter: filter,
+        attributes: %w(uid sn givenName mail eduPersonPrincipalName)
+      ) { |entry|
+        if entry.attribute_names.include?(:uid) || entry.attribute_names.include?(:eduPersonPrincipalName)
+          users << User.new(
+            uid: entry.attribute_names.include?(:uid) ? entry.uid.first : entry.eduPersonPrincipalName.first.gsub(/\@.*/,""),
+            first_name: entry.givenName.first,
+            last_name: entry.sn.first,
+            email: entry.attribute_names.include?(:mail) ? entry.mail.first : entry.eduPersonPrincipalName.first,
+            is_real: true
+          )
+        end
+      }
+      render json: users
     end
 
     def redirect_to_consumer
