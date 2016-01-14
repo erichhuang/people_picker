@@ -21,6 +21,12 @@ RUN ["chmod", "777", "/root/installs/install_ruby.sh"]
 RUN ["/root/installs/install_ruby.sh"]
 RUN ["/usr/local/bin/gem", "install", "bundler", "-v", "1.11.2"]
 
+# ssl certs
+ADD docker/includes/install_ssl_cert.sh /root/installs/install_ssl_cert.sh
+ADD docker/includes/cert_config /root/installs/cert_config
+RUN ["chmod", "u+x", "/root/installs/install_ssl_cert.sh"]
+RUN ["/root/installs/install_ssl_cert.sh"]
+
 #sqlite client
 RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "sqlite", "sqlite-devel"]
 
