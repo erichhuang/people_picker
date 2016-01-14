@@ -22,5 +22,17 @@ module PeoplePicker
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+    config.paths.add File.join('app', 'api'), glob: File.join('**', '*.rb')
+    config.autoload_paths += Dir[Rails.root.join('app', 'api', '*')]
+
+    config.middleware.insert_before 0, "Rack::Cors", :debug => true, :logger => (-> { Rails.logger }) do
+     allow do
+       origins '*'
+       resource '*',
+         :headers => :any,
+         :methods => [:get, :post, :options, :delete, :put, :patch, :head],
+         :max_age => 0
+     end
+    end
   end
 end

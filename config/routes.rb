@@ -7,4 +7,6 @@ Rails.application.routes.draw do
       get 'fetch'
     end
   end
+  mount DukeAuth::Base, at: '/'
+  get :authenticate, to: 'users#index'
 end
