@@ -49,7 +49,7 @@ class UsersController < ApplicationController
       end
 
       if @scope.count > 0
-        render json: @scope.all
+        render json: @scope.all, layout: false
       else
         fetch_ldap
       end
@@ -82,7 +82,7 @@ class UsersController < ApplicationController
     @user.is_real = false
     respond_to do |format|
       if @user.save
-        format.html { render json: @user }
+        format.html { render json: @user, layout: false }
       else
         validation_errors = {}
         @user.errors.messages.each do |field, errors|
@@ -90,7 +90,7 @@ class UsersController < ApplicationController
             validation_errors[field] = message
           end
         end
-        format.html { render json: validation_errors }
+        format.html { render json: validation_errors, layout: false }
       end
     end
   end
@@ -118,23 +118,19 @@ class UsersController < ApplicationController
       if number > 5
         render plain: 'invalid_request', status: 401, layout: false
       else
-        users = User.limit(number)
-        if users.count < number
-          remaining = number - users.count
-          users += FactoryGirl.build_list(:user, remaining)
-        end
-        render json: users
+        users = FactoryGirl.build_list(:user, number)
+        render json: users, layout: false
       end
     end
 
     def fetch_ldap
       if params[:first_name_begins] && params[:first_name_begins].length < 3
-        render json: []
+        render json: [], layout: false
         return
       end
 
       if params[:last_name_begins] && params[:last_name_begins].length < 3
-        render json: []
+        render json: [], layout: false
         return
       end
 
@@ -169,7 +165,7 @@ class UsersController < ApplicationController
           )
         end
       }
-      render json: users
+      render json: users, layout: false
     end
 
     def redirect_to_consumer

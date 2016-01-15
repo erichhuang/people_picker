@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe UsersController, type: :controller do
-
   let(:users) { FactoryGirl.create_list(:user, 3) }
   let(:consumer) { FactoryGirl.create(:consumer) }
   let(:response_type) { 'token' }
@@ -309,39 +308,19 @@ RSpec.describe UsersController, type: :controller do
       context 'number=y' do
         let(:request_params) { {number: requested_count} }
         context 'y <=5' do
-          context 'y <= User.count' do
-            let(:requested_count) { 3 }
-            before do
-              users.map {|u| expect(u).to be_persisted}
-              expect(request_params[:number]).to be <= User.count
-            end
-
-            it_behaves_like 'a successful request' do
-              it 'should return an array of persisted JSON Users' do
-                users = JSON.parse(@response.body)
-                expect(users).to have_key "users"
-                expect(users["users"].count).to eq(requested_count)
-                users["users"].each do |user|
-                  expect(user['is_persisted']).to be true
-                end
-              end
-            end
+          let(:requested_count) { 3 }
+          before do
+            users.map {|u| expect(u).to be_persisted}
           end
 
-          context 'y > User.count' do
-            let(:requested_count) { 5 }
-            before do
-              users.map {|u| expect(u).to be_persisted}
-              expect(request_params[:number]).to be > User.count
-            end
-
-            it_behaves_like 'a successful request' do
-              it 'should return an array of persisted JSON Users' do
-                users = JSON.parse(@response.body)
-                expect(users).to have_key "users"
-                expect(users["users"].count).to eq(requested_count)
-                expect(users["users"].select{|u| u["is_persisted"]}.count).to eq(User.count)
-                expect(users["users"].reject{|u| u["is_persisted"]}.count).to eq(5 - User.count)
+          it_behaves_like 'a successful request' do
+            it 'should return a JSON array of fake unpersisted Users' do
+              users = JSON.parse(@response.body)
+              expect(users).to have_key "users"
+              expect(users["users"].count).to eq(requested_count)
+              users["users"].each do |user|
+                expect(user['is_persisted']).to be false
+                expect(user['is_real']).to be false
               end
             end
           end
