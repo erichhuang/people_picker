@@ -79,7 +79,6 @@ class UsersController < ApplicationController
       return
     end
     @user = User.new(user_params)
-    @user.is_real = false
     respond_to do |format|
       if @user.save
         format.html { render json: @user, layout: false }
