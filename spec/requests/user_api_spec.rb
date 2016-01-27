@@ -24,7 +24,6 @@ describe DukeAuth::V1::UserAPI do
 
   describe 'get token_info' do
     it 'should respond with a JSON object that describes the valid token' do
-      $stderr.puts "\n\ntoken: #{token}"
       get "/api/v1/token_info/", {access_token: token}, json_headers
       expect(response.status).to eq(200)
       expect(response.body).to be
