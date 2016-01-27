@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :user do
-    uid { "#{Faker::Name.name}#{Faker::Number.number(3)}" }
+    uid { "#{Faker::Name.first_name[0]}#{Faker::Name.last_name}#{Faker::Number.number(3)}" }
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name}
     email { Faker::Internet.email }
