@@ -9,3 +9,5 @@ db:
   extends:
     file: dc-base.yml
     service: db
+redis:
+  image: redis
