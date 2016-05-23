@@ -2,7 +2,6 @@ FROM centos:latest
 MAINTAINER Darin London <darin.london@duke.edu>
 
 RUN ["/usr/bin/yum", "clean", "all"]
-RUN ["/usr/bin/yum", "distro-sync", "-q", "-y", "--nogpgcheck"]
 RUN ["/usr/bin/yum", "update", "-q", "-y","--nogpgcheck"]
 RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "gcc","gcc-c++", "glibc-static", "which", "zlib-devel", "readline-devel", "libcurl-devel", "tar"]
 RUN ["/usr/bin/yum", "install", "-y", "--nogpgcheck", "openssl", "openssl-devel"]
